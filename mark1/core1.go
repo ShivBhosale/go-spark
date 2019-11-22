@@ -21,17 +21,13 @@ what I think it should be:
 
 	*/
 
-
-
 import (
 	"fmt"
 	"strings"
 	"github.com/jinzhu/copier"
+	"github.com/davecgh/go-spew/spew"
 )
 
-
-// first class ANON func for transformations
-type transformer func(interface{}) interface{}
 
 // Example mapper functions 
 func upper(str interface{}) interface{}{
@@ -47,7 +43,16 @@ type BaseRDD struct{
 	file interface{}
 }
 
-// right now I'm assuming that everything is a string
+/*
+* ALL TRANSFORM OPERATIONS ON THE RDD
+* ------ right now I'm assuming that everything is a string ---
+*/
+
+
+// MAPPER
+// first class ANON func for transformations
+type transformer func(interface{}) interface{}
+
 func (base BaseRDD) mapper(t transformer, index int) BaseRDD{
 	var returnRDD = BaseRDD{}
 	// Create a copy
@@ -58,16 +63,21 @@ func (base BaseRDD) mapper(t transformer, index int) BaseRDD{
 	return returnRDD
 }
 
+// SHOW
+func (base BaseRDD) show(){
+	rddStr := spew.Sdump(base)
+	fmt.Println(rddStr+"\n")
+}
+
 
 // Limitation is that I have to depend on a single signature for passing data
 func main() {
 	var RDD1 = BaseRDD{file:[][]string{{"aBCdEF", "consume"}, {"vaporwave"}}}
-	fmt.Println(RDD1)
+	RDD1.show()
 	RDD2 := RDD1.mapper(upper, 0)
 	fmt.Println("After transformation 1:\n")
-	fmt.Println(RDD2)
+	RDD2.show()
 	fmt.Println("After tranformation 2:\n")
 	RDD3 := RDD2.mapper(customSpacer, 1)
-	fmt.Println(RDD3)
-
+	RDD3.show()
 }
